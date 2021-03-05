@@ -2,4 +2,10 @@
     let x = 'something';
 </script>
 
-<div>Hello From Sevlte</div>
+<h1>Hello From Sevlte form saurav</h1>
+
+<style>
+    h1 {
+        color: aqua;
+    }
+</style>
