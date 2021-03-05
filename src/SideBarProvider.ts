@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getNonce } from "./getNonce";
-import { getLocalBranches } from "./helpers/utils";
+import { getLocalBranches, getRemoteBranches } from "./helpers/utils";
 
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
@@ -26,6 +26,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         case "fetch-branhes":
           let value = await getLocalBranches();
           vscode.window.showInformationMessage(value);
+          break;
+        case "fetch-remote-branhes":
+          let remote = await getRemoteBranches();
+          vscode.window.showInformationMessage(remote);
           break;
         case "onInfo": {
           if (!data.value) {

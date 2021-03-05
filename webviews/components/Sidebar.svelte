@@ -12,7 +12,7 @@
     <br />
     <button
         on:click={() =>
-            tsvscode.postMessage({ type: 'onError', value: 'error' })}
+            tsvscode.postMessage({ type: 'fetch-remote-branhes', value: 'error' })}
         >Error</button
     >
     <Accordian title="Local Branches" list={branches} />

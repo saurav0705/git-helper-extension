@@ -17,3 +17,7 @@ export const getLocalBranches = async () => {
     let data  = await execShell(`cd ${vscode.workspace.rootPath} && git branch`);
     return data;
 }
+export const getRemoteBranches = async () => {
+    let data  = await execShell(`cd ${vscode.workspace.rootPath} && git branch -r`);
+    return data.split(' ').map(item => item.replace("origin/","")).join("\n");
+}
