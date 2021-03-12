@@ -1,22 +1,42 @@
 <script>
+    import { onMount } from 'svelte';
     import Accordian from './Accordian.svelte';
-    let branches = ['master', 'production', 'main'];
+    import setVar,{sendMessage,fetchValues} from '../utils';
+    let branches = [];
+    let remote_branches = []
+    onMount(()=>{
+        setVar(tsvscode);
+        fetchValues();
+    })
+    window.addEventListener('message', event => {
+
+            const message = event.data; // The JSON data our extension sent
+
+            switch (message.command) {
+                case 'local_branches':
+                    branches = [...message.data];
+                    break;
+                case 'remote_branches':
+                    remote_branches = [...message.data];
+                    break;
+            }
+            });
 </script>
 
 <div>
     <div>Git Helper</div>
     <button
-        on:click={() => tsvscode.postMessage({ type: 'fetch-branhes', value: 'info' })}
+        on:click={() => sendMessage({ type: 'fetch-branhes', value: 'info' })}
         >info</button
     >
     <br />
     <button
         on:click={() =>
-            tsvscode.postMessage({ type: 'fetch-remote-branhes', value: 'error' })}
+            sendMessage({ type: 'fetch-remote-branhes', value: 'error' })}
         >Error</button
     >
-    <Accordian title="Local Branches" list={branches} />
-    <Accordian title="Global Branches" list={branches} />
+    <Accordian title="Local Branches" list={branches} type="local" />
+    <Accordian title="Global Branches" list={remote_branches} type="remote"/>
 </div>
 
 <style>

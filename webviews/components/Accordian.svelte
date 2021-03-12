@@ -1,9 +1,8 @@
-<script lang="ts">
-import { onMount } from "svelte";
-
-
-    export let title: String;
-    export let list: Array <[]>;
+<script>
+    import Tile from './Tile.svelte';
+    export let title;
+    export let list;
+    export let type;
     let show = true;
 </script>
 
@@ -11,7 +10,7 @@ import { onMount } from "svelte";
     <div on:click={() => (show = !show)}>{title} ></div>
     <div class={show ? 'content show' : 'content hide'}>
         {#each list as item, index}
-            <div>{index + 1}. {item}</div>
+            <Tile selected={item.selected} title={item.branch} type={type}/>
         {/each}
     </div>
 </div>

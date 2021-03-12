@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getNonce } from "./getNonce";
-import { getLocalBranches, getRemoteBranches } from "./helpers/utils";
+import { getLocalBranches, getRemoteBranches, processResponse ,deleteLocalBranch} from "./helpers/utils";
 
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
@@ -8,6 +8,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   _doc?: vscode.TextDocument;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
+
+  
+  sendMessageToWebView(data:{command:string,data:any}){
+    this._view?.webview.postMessage(data)
+  }
 
   public resolveWebviewView(webviewView: vscode.WebviewView) {
     this._view = webviewView;
@@ -21,28 +26,38 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-    webviewView.webview.onDidReceiveMessage(async (data) => {
+    webviewView.webview.onDidReceiveMessage((data) => {
       switch (data.type) { 
         case "fetch-branhes":
-          let value = await getLocalBranches();
-          vscode.window.showInformationMessage(value);
+          getLocalBranches().then(resp => {
+          this.sendMessageToWebView({ command: 'local_branches', data:processResponse(resp) })
+        });
           break;
         case "fetch-remote-branhes":
-          let remote = await getRemoteBranches();
-          vscode.window.showInformationMessage(remote);
+          getRemoteBranches().then(resp => {
+          this.sendMessageToWebView({ command: 'remote_branches', data:processResponse(resp) })
+        });
           break;
         case "onInfo": {
-          if (!data.value) {
+          if (!data.data) {
             return;
           }
-          vscode.window.showInformationMessage(data.value);
+          vscode.window.showInformationMessage(data.data);
           break;
         }
+        case 'deleteBranch':
+          deleteLocalBranch(data.data).then(resp => 
+            {
+              vscode.window.showInformationMessage("Branch Deleted Succesfully");
+            
+          }
+            ).catch(err => vscode.window.showErrorMessage("something went wrong"))
+            break;
         case "onError": {
-          if (!data.value) {
+          if (!data.data) {
             return;
           }
-          vscode.window.showErrorMessage(data.value);
+          vscode.window.showErrorMessage(data.data);
           break;
         }
       }
@@ -97,3 +112,5 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 			</html>`;
   }
 }
+
+

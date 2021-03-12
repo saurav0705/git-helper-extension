@@ -3,6 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
+import svelteSVG from 'rollup-plugin-svelte-svg';
 import typescript from '@rollup/plugin-typescript';
 import path from 'path';
 import fs from 'fs';
@@ -48,6 +49,7 @@ export default fs
                     sourceMap: !production,
                     inlineSources: !production
                 }),
+                svelteSVG(),
 
                 // In dev mode, call `npm run start` once
                 // the bundle has been generated

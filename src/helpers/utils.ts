@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-const terminal = vscode.window.createTerminal(`Ext Terminal `);
-
 import * as cp from 'child_process';
 
 const execShell = (cmd: string) =>
@@ -14,10 +12,25 @@ const execShell = (cmd: string) =>
     });
 
 export const getLocalBranches = async () => {
-    let data  = await execShell(`cd ${vscode.workspace.rootPath} && git branch`);
-    return data;
+        let data:string  = await execShell(`cd ${vscode.workspace.rootPath} && git branch`);
+        return data;
 }
 export const getRemoteBranches = async () => {
-    let data  = await execShell(`cd ${vscode.workspace.rootPath} && git branch -r`);
-    return data.split(' ').map(item => item.replace("origin/","")).join("\n");
+        let data = await execShell(`cd ${vscode.workspace.rootPath} && git branch -r`);
+        return data.replaceAll("origin/","");
+    
+}
+
+export const deleteLocalBranch = async (branch:string) => {
+    try{
+    let res = await execShell(`cd ${vscode.workspace.rootPath} && git branch -D ${branch}`);
+    return {data: res};
+    } catch(err){
+        return {error : "Oops something happened not able to delte the branch"}
+    }
+}
+
+export const processResponse = (data:string) => {
+    let branchArray:string[] = data.split("\n");
+    return branchArray.map(item => ({selected:item.includes("*"),branch:item.replace("*","")}))
 }
