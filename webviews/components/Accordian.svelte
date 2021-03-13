@@ -1,5 +1,8 @@
 <script>
     import Tile from './Tile.svelte';
+    import SideIcon from '../assets/icons/right.svg';
+    import DownIcon from '../assets/icons/down.svg';
+
     export let title;
     export let list;
     export let type;
@@ -17,8 +20,17 @@
     }
 </script>
 
-<div>
-    <div on:click={() => (show = !show)}>{title} ></div>
+<div class="accordian">
+    <div on:click={() => (show = !show)} class="title">
+        <div>{title}</div>
+        <div>
+            {#if show}
+                <DownIcon width="15px" />
+            {:else}
+                <SideIcon width="15px" />
+            {/if}
+        </div>
+    </div>
     <div class={show ? 'content show' : 'content hide'}>
         <input
             type="search"
@@ -37,15 +49,33 @@
     </div>
 </div>
 
-<style>
-    .content {
-        overflow: hidden;
-    }
-    .show {
-        height: auto;
-    }
+<style type="text/scss">
+    .accordian {
+        padding: 5px 10px;
+        margin-top: 4px;
 
-    .hide {
-        height: 0;
+        &:hover {
+            box-shadow: -5px 5px 10px var(--vscode-input-background),
+                5px -5px 10px var(--vscode-input-background);
+        }
+        .title {
+            cursor: pointer;
+            color: rgb(121, 212, 118);
+            font-weight: 700;
+            padding: 3px 0px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .content {
+            overflow-y: scroll;
+            max-height: 20vh;
+        }
+        .show {
+            height: auto;
+        }
+
+        .hide {
+            height: 0;
+        }
     }
 </style>
