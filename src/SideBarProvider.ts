@@ -46,7 +46,15 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     fetchAllGitFolders().then((res: any) => {
                         this.sendMessageToWebView({
                             command: 'folders',
-                            data: res.filter((item: any) => item.isGitRepo)
+                            data: [
+                                {
+                                    folder: 'sp-seller-dashboard-metrics',
+                                    path:
+                                        '/Users/saurav.aggarwal/Desktop/Flipkart/sp-seller-dashboard/client/apps/metrics',
+                                    isGitRepo: true
+                                },
+                                ...res.filter((item: any) => item.isGitRepo)
+                            ]
                         });
                     });
                     break;
