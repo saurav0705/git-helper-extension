@@ -27,19 +27,31 @@
     });
 </script>
 
-<div>
-    <div>{name}</div>
+<div class="git-folder">
+    <div class="title">
+        <div class="name">{name}</div>
+    </div>
     <Accordian title="Local Branches" list={branches} type="local" {path} />
     <Accordian
-        title="Global Branches"
+        title="Remote Branches"
         list={remote_branches}
         type="remote"
         {path}
     />
 </div>
 
-<style>
-    div {
-        color: antiquewhite;
+<style type="text/scss">
+    .git-folder {
+        padding: 3px;
+        &:hover {
+            outline: 1px solid var(--vscode-input-background);
+        }
+        .title {
+            display: flex;
+            position: relative;
+            .name {
+                font-weight: 800;
+            }
+        }
     }
 </style>

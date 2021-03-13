@@ -45,7 +45,7 @@ export const fetchRemoteBranch = async (branch: string, path: string) => {
 };
 
 export const processResponse = (data: string) => {
-    return data.split('\n').reduce((prev, item) => {
+    return data.split('\n').reduce((prev: any[], item: any) => {
         let obj = {
             selected: item.includes('*'),
             branch: item.replace('*', '')
