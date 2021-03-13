@@ -12,25 +12,48 @@ const execShell = (cmd: string) =>
     });
 
 export const getLocalBranches = async () => {
-        let data:string  = await execShell(`cd ${vscode.workspace.rootPath} && git branch`);
-        return data;
-}
+    let data: string = await execShell(
+        `cd ${vscode.workspace.rootPath} && git branch`
+    );
+    return data;
+};
 export const getRemoteBranches = async () => {
-        let data = await execShell(`cd ${vscode.workspace.rootPath} && git branch -r`);
-        return data.replaceAll("origin/","");
-    
-}
+    let data = await execShell(
+        `cd ${vscode.workspace.rootPath} && git branch -r`
+    );
+    return data.replace(/origin\//g, '');
+};
 
-export const deleteLocalBranch = async (branch:string) => {
-    try{
-    let res = await execShell(`cd ${vscode.workspace.rootPath} && git branch -D ${branch}`);
-    return {data: res};
-    } catch(err){
-        return {error : "Oops something happened not able to delte the branch"}
+export const deleteLocalBranch = async (branch: string) => {
+    try {
+        let res = await execShell(
+            `cd ${vscode.workspace.rootPath} && git branch -D ${branch.trim()}`
+        );
+        return { data: res };
+    } catch (err) {
+        // eslint-disable-next-line no-throw-literal
+        throw `Oops something happened not able to delete the branch: ${branch}`;
     }
-}
+};
 
-export const processResponse = (data:string) => {
-    let branchArray:string[] = data.split("\n");
-    return branchArray.map(item => ({selected:item.includes("*"),branch:item.replace("*","")}))
-}
+export const fetchRemoteBranch = async (branch: string) => {
+    try {
+        let res = await execShell(
+            `cd ${
+                vscode.workspace.rootPath
+            } && git fetch origin ${branch.trim()}:${branch.trim()}`
+        );
+        return { data: res };
+    } catch (err) {
+        // eslint-disable-next-line no-throw-literal
+        throw `Oops something happened not able to fetch the branch: ${branch}`;
+    }
+};
+
+export const processResponse = (data: string) => {
+    let branchArray: string[] = data.split('\n');
+    return branchArray.map((item) => ({
+        selected: item.includes('*'),
+        branch: item.replace('*', '')
+    }));
+};
