@@ -7,7 +7,7 @@
         deleteLocalBranch,
         fetchRemoteBranch
     } from '../utils';
-
+    export let path;
     const actions = {
         local: [
             { title: 'delete', component: Trash, action: deleteLocalBranch },
@@ -40,7 +40,7 @@
                           errorMessage(
                               'cannot perform deletion on current branch'
                           )
-                    : () => item.action(title)}
+                    : () => item.action(title, path)}
             >
                 <svelte:component this={item.component} {...width} />
             </span>

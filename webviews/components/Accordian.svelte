@@ -2,7 +2,7 @@
     import Tile from './Tile.svelte';
     import SideIcon from '../assets/icons/right.svg';
     import DownIcon from '../assets/icons/down.svg';
-
+    export let path;
     export let title;
     export let list;
     export let type;
@@ -23,6 +23,9 @@
 <div class="accordian">
     <div on:click={() => (show = !show)} class="title">
         <div>{title}</div>
+        <div class="search-result-count">
+            {searchText.length ? showList.length : list.length}
+        </div>
         <div>
             {#if show}
                 <DownIcon width="15px" />
@@ -37,15 +40,27 @@
             bind:value={searchText}
             placeholder="Search Branch"
         />
-        {#if showList.length > 0 || searchText.length}
-            {#each showList as item, index}
-                <Tile selected={item.selected} title={item.branch} {type} />
-            {/each}
-        {:else}
-            {#each list as item, index}
-                <Tile selected={item.selected} title={item.branch} {type} />
-            {/each}
-        {/if}
+        <div class="results">
+            {#if showList.length > 0 || searchText.length}
+                {#each showList as item, index}
+                    <Tile
+                        selected={item.selected}
+                        title={item.branch}
+                        {type}
+                        {path}
+                    />
+                {/each}
+            {:else}
+                {#each list as item, index}
+                    <Tile
+                        selected={item.selected}
+                        title={item.branch}
+                        {type}
+                        {path}
+                    />
+                {/each}
+            {/if}
+        </div>
     </div>
 </div>
 
@@ -64,11 +79,18 @@
             font-weight: 700;
             padding: 3px 0px;
             display: flex;
-            justify-content: space-between;
+            .search-result-count {
+                font-size: 7px;
+                font-weight: 200;
+                margin-left: auto;
+            }
         }
         .content {
-            overflow-y: scroll;
-            max-height: 20vh;
+            overflow: hidden;
+            .results {
+                overflow-y: scroll;
+                max-height: 20vh;
+            }
         }
         .show {
             height: auto;

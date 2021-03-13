@@ -5,7 +5,8 @@ import {
     getRemoteBranches,
     processResponse,
     deleteLocalBranch,
-    fetchRemoteBranch
+    fetchRemoteBranch,
+    fetchAllGitFolders
 } from './helpers/utils';
 import * as actions from './constants/actions';
 
@@ -19,10 +20,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         this._view?.webview.postMessage(data);
     }
 
-    performActionAndRefresh(fn: () => void) {
+    performActionAndRefresh(fn: () => void, path: string) {
         fn();
         this.sendMessageToWebView({
-            command: 'refresh',
+            command: `${path}refresh`,
             data: {}
         });
     }
@@ -41,26 +42,36 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.onDidReceiveMessage((data) => {
             switch (data.type) {
+                case 'folders':
+                    fetchAllGitFolders().then((res: any) => {
+                        this.sendMessageToWebView({
+                            command: 'folders',
+                            data: res.filter((item: any) => item.isGitRepo)
+                        });
+                    });
+                    break;
                 case actions.fetchLocalBranches:
-                    getLocalBranches().then((resp) => {
-                        this.performActionAndRefresh(() =>
-                            this.sendMessageToWebView({
-                                command: 'local_branches',
-                                data: processResponse(resp)
-                            })
+                    getLocalBranches(data.data).then((resp) => {
+                        this.performActionAndRefresh(
+                            () =>
+                                this.sendMessageToWebView({
+                                    command: `${data.data}local_branches`,
+                                    data: processResponse(resp)
+                                }),
+                            data.data
                         );
                     });
                     break;
                 case actions.fetchAllRemoteBranches:
-                    getRemoteBranches().then((resp) => {
+                    getRemoteBranches(data.data).then((resp) => {
                         this.sendMessageToWebView({
-                            command: 'remote_branches',
+                            command: `${data.data}remote_branches`,
                             data: processResponse(resp)
                         });
                     });
                     break;
                 case actions.deleteLocalBranch:
-                    deleteLocalBranch(data.data)
+                    deleteLocalBranch(data.data.branch, data.data.path)
                         .then((resp) => {
                             vscode.window.showInformationMessage(
                                 'Branch Deleted Succesfully'
@@ -69,7 +80,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                         .catch((err) => vscode.window.showErrorMessage(err));
                     break;
                 case actions.fetchRemoteBranchToLocal:
-                    fetchRemoteBranch(data.data)
+                    fetchRemoteBranch(data.data.branch, data.data.path)
                         .then((resp) => {
                             vscode.window.showInformationMessage(
                                 'Branch Fetched Succesfully'
