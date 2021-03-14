@@ -2,11 +2,15 @@
     import { onMount } from 'svelte';
     import Accordian from './Accordian.svelte';
     import { slide } from 'svelte/transition';
-    import setVar, { fetchValues } from '../utils';
+    import setVar, { fetchValues, infoMessage } from '../utils';
+    import SideIcon from '../assets/icons/right.svg';
+    import DownIcon from '../assets/icons/down.svg';
+    import HideIcon from '../assets/icons/hide.svg';
     export let path;
     export let name;
     export let selected;
     export let updateSelected;
+    export let toggleHiddenStatus;
     let branches = [];
     let remote_branches = [];
     onMount(() => {
@@ -34,6 +38,21 @@
 <div class="git-folder">
     <div class="title" on:click={() => updateSelected(name)}>
         <div class="name">{name}</div>
+        <div class="icon">
+            <span
+                on:click|stopPropagation={() => {
+                    toggleHiddenStatus({ name, path });
+                    infoMessage(`Hidden Git Repo : ${name}`);
+                }}
+            >
+                <HideIcon width="15px" />
+            </span>
+            {#if selected === name}
+                <DownIcon width="15px" />
+            {:else}
+                <SideIcon width="15px" />
+            {/if}
+        </div>
     </div>
     {#if selected === name}
         <div class="content" transition:slide>
@@ -59,12 +78,6 @@
         .content {
             overflow: hidden;
         }
-        .show {
-            height: auto;
-        }
-        .hide {
-            height: 0;
-        }
         &:hover {
             outline: 1px solid var(--vscode-input-background);
         }
@@ -74,6 +87,13 @@
             cursor: pointer;
             .name {
                 font-weight: 800;
+            }
+            .icon {
+                margin-left: auto;
+                opacity: 0.5;
+                &:hover {
+                    opacity: 1;
+                }
             }
         }
     }

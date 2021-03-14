@@ -50,7 +50,6 @@
                             title={item.branch}
                             {type}
                             {path}
-                            transition:slide
                         />
                     {/each}
                 {:else}
@@ -95,13 +94,6 @@
                 overflow-y: scroll;
                 max-height: 20vh;
             }
-        }
-        .show {
-            height: auto;
-        }
-
-        .hide {
-            height: 0;
         }
     }
 </style>

@@ -36,6 +36,6 @@ export const fetchRemoteBranch = (branch, path) => {
 };
 
 export const fetchFolders = () => {
-    tsvscode?.postMessage({ type: 'folders' });
+    tsvscode?.postMessage({ type: actions.getAllGitFolders });
 };
 export default setTsVscode;

@@ -44,7 +44,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 ...prev,
                 {
                     path,
-                    folder: splitArray[splitArray.length - 1]
+                    name: splitArray[splitArray.length - 1]
                 }
             ];
         }, []);
@@ -64,19 +64,19 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.onDidReceiveMessage((data) => {
             switch (data.type) {
-                case 'folders':
+                case actions.getAllGitFolders:
                     if (!getFoldersArray().length) {
                         fetchAllGitFolders().then((res: any) => {
                             let folders = this.processFolders(res || []);
                             setFoldersArray(folders);
                             this.sendMessageToWebView({
-                                command: 'folders',
+                                command: 'GIT_FOLDERS',
                                 data: folders
                             });
                         });
                     } else {
                         this.sendMessageToWebView({
-                            command: 'folders',
+                            command: 'GIT_FOLDERS',
                             data: getFoldersArray()
                         });
                     }
