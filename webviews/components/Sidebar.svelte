@@ -3,6 +3,14 @@
     import setVar, { fetchFolders } from '../utils';
     import GitFolder from './GitFolder.svelte';
     let folders = [];
+    let selected;
+    const updateSelected = (name) => {
+        if (selected === name) {
+            selected = '';
+            return;
+        }
+        selected = name;
+    };
     onMount(() => {
         setVar(tsvscode);
         fetchFolders();
@@ -13,6 +21,7 @@
         switch (message.command) {
             case 'folders':
                 folders = [...message.data];
+                selected = message.data.length ? message.data[0].folder : '';
                 break;
         }
     });
@@ -21,7 +30,12 @@
 <div>
     <div>Git Helper</div>
     {#each folders as folder}
-        <GitFolder name={folder.folder} path={folder.path} />
+        <GitFolder
+            name={folder.folder}
+            path={folder.path}
+            {selected}
+            {updateSelected}
+        />
     {/each}
 </div>
 

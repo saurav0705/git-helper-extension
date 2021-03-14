@@ -6,7 +6,9 @@ import {
     processResponse,
     deleteLocalBranch,
     fetchRemoteBranch,
-    fetchAllGitFolders
+    fetchAllGitFolders,
+    getFoldersArray,
+    setFoldersArray
 } from './helpers/utils';
 import * as actions from './constants/actions';
 
@@ -28,6 +30,26 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         });
     }
 
+    processFolders = (folders: any) => {
+        let flattenFolders = folders.reduce((prev: [], item: any) => {
+            return [...prev, ...item];
+        }, []);
+        let filteredFolders =
+            flattenFolders.filter((item: any) => item.endsWith('.git')) || [];
+
+        return filteredFolders.reduce((prev: any, item: any) => {
+            let path = item.replace('/.git', '');
+            let splitArray = path.split('/');
+            return [
+                ...prev,
+                {
+                    path,
+                    folder: splitArray[splitArray.length - 1]
+                }
+            ];
+        }, []);
+    };
+
     public resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView;
 
@@ -43,20 +65,21 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage((data) => {
             switch (data.type) {
                 case 'folders':
-                    fetchAllGitFolders().then((res: any) => {
+                    if (!getFoldersArray().length) {
+                        fetchAllGitFolders().then((res: any) => {
+                            let folders = this.processFolders(res || []);
+                            setFoldersArray(folders);
+                            this.sendMessageToWebView({
+                                command: 'folders',
+                                data: folders
+                            });
+                        });
+                    } else {
                         this.sendMessageToWebView({
                             command: 'folders',
-                            data: [
-                                {
-                                    folder: 'sp-seller-dashboard-metrics',
-                                    path:
-                                        '/Users/saurav.aggarwal/Desktop/Flipkart/sp-seller-dashboard/client/apps/metrics',
-                                    isGitRepo: true
-                                },
-                                ...res.filter((item: any) => item.isGitRepo)
-                            ]
+                            data: getFoldersArray()
                         });
-                    });
+                    }
                     break;
                 case actions.fetchLocalBranches:
                     getLocalBranches(data.data).then((resp) => {

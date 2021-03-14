@@ -2,12 +2,13 @@
     import Tile from './Tile.svelte';
     import SideIcon from '../assets/icons/right.svg';
     import DownIcon from '../assets/icons/down.svg';
+    import { slide } from 'svelte/transition';
     export let path;
     export let title;
     export let list;
     export let type;
     let showList = [];
-    let show = true;
+    let show = false;
     let searchText = '';
 
     const filterList = () => {
@@ -34,34 +35,37 @@
             {/if}
         </div>
     </div>
-    <div class={show ? 'content show' : 'content hide'}>
-        <input
-            type="search"
-            bind:value={searchText}
-            placeholder="Search Branch"
-        />
-        <div class="results">
-            {#if showList.length > 0 || searchText.length}
-                {#each showList as item, index}
-                    <Tile
-                        selected={item.selected}
-                        title={item.branch}
-                        {type}
-                        {path}
-                    />
-                {/each}
-            {:else}
-                {#each list as item, index}
-                    <Tile
-                        selected={item.selected}
-                        title={item.branch}
-                        {type}
-                        {path}
-                    />
-                {/each}
-            {/if}
+    {#if show}
+        <div class="content" transition:slide>
+            <input
+                type="search"
+                bind:value={searchText}
+                placeholder="Search Branch"
+            />
+            <div class="results">
+                {#if showList.length > 0 || searchText.length}
+                    {#each showList as item, index}
+                        <Tile
+                            selected={item.selected}
+                            title={item.branch}
+                            {type}
+                            {path}
+                            transition:slide
+                        />
+                    {/each}
+                {:else}
+                    {#each list as item, index}
+                        <Tile
+                            selected={item.selected}
+                            title={item.branch}
+                            {type}
+                            {path}
+                        />
+                    {/each}
+                {/if}
+            </div>
         </div>
-    </div>
+    {/if}
 </div>
 
 <style type="text/scss">
