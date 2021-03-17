@@ -2,10 +2,9 @@
     import { onMount } from 'svelte';
     import SortableList from 'svelte-sortable-list';
     import { slide } from 'svelte/transition';
-    import SideIcon from '../assets/icons/right.svg';
-    import DownIcon from '../assets/icons/down.svg';
     import setVar, { fetchFolders } from '../utils';
     import GitFolder from './GitFolder.svelte';
+    import OpenClose from './OpenClose.svelte';
     let folders = [];
     let hidden = {};
     let selected;
@@ -30,7 +29,13 @@
         fetchFolders();
     });
     const sortList = (ev) => {
-        folders = ev.detail;
+        folders = [
+            ...folders.map(({ name, folders }) =>
+                name === selectedWorkSpace
+                    ? { name, folders: ev.detail }
+                    : { name, folders }
+            )
+        ];
     };
 
     const toggleHiddenStatus = ({ name, path }) => {
@@ -79,24 +84,18 @@
             </div>
         </div>
     {/if}
-    <SortableList list={folders} key="name" on:sort={sortList} let:item>
+    {#each folders as workspace}
         <div
-            on:click={() => updateSelectedWorkspace(item.name)}
+            on:click={() => updateSelectedWorkspace(workspace.name)}
             class="workspace"
         >
-            <div>{item.name}</div>
-            <div>
-                {#if selectedWorkSpace === item.name}
-                    <DownIcon width="15px" />
-                {:else}
-                    <SideIcon width="15px" />
-                {/if}
-            </div>
+            <div>{workspace.name}</div>
+            <OpenClose open={selectedWorkSpace === workspace.name} />
         </div>
-        {#if selectedWorkSpace === item.name}
+        {#if selectedWorkSpace === workspace.name}
             <div transition:slide>
                 <SortableList
-                    list={item.folders}
+                    list={workspace.folders}
                     key="path"
                     on:sort={sortList}
                     let:item
@@ -111,7 +110,7 @@
                 </SortableList>
             </div>
         {/if}
-    </SortableList>
+    {/each}
 </div>
 
 <style type="text/scss">

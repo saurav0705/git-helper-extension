@@ -3,9 +3,8 @@
     import Accordian from './Accordian.svelte';
     import { slide } from 'svelte/transition';
     import setVar, { fetchValues, infoMessage } from '../utils';
-    import SideIcon from '../assets/icons/right.svg';
-    import DownIcon from '../assets/icons/down.svg';
     import HideIcon from '../assets/icons/hide.svg';
+    import OpenClose from './OpenClose.svelte';
     export let path;
     export let name;
     export let selected;
@@ -47,11 +46,7 @@
             >
                 <HideIcon width="15px" />
             </span>
-            {#if selected === name}
-                <DownIcon width="15px" />
-            {:else}
-                <SideIcon width="15px" />
-            {/if}
+            <OpenClose open={selected === name} />
         </div>
     </div>
     {#if selected === name}

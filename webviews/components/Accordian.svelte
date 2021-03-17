@@ -1,8 +1,7 @@
 <script>
     import Tile from './Tile.svelte';
-    import SideIcon from '../assets/icons/right.svg';
-    import DownIcon from '../assets/icons/down.svg';
     import { slide } from 'svelte/transition';
+    import OpenClose from './OpenClose.svelte';
     export let path;
     export let title;
     export let list;
@@ -27,13 +26,7 @@
         <div class="search-result-count">
             {searchText.length ? showList.length : list.length}
         </div>
-        <div>
-            {#if show}
-                <DownIcon width="15px" />
-            {:else}
-                <SideIcon width="15px" />
-            {/if}
-        </div>
+        <OpenClose open={show} />
     </div>
     {#if show}
         <div class="content" transition:slide>
