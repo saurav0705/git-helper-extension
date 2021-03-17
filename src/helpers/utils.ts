@@ -99,7 +99,7 @@ const getAllSubFolders = (baseFolder: string, folderList: any = []) => {
 export const fetchAllGitFolders = () => {
     let result: any = vscode.workspace.workspaceFolders?.map(
         async ({ name, uri }) => {
-            return getAllSubFolders(uri.path);
+            return { name, folders: getAllSubFolders(uri.path) };
         }
     );
 

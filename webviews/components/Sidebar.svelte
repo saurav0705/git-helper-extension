@@ -1,17 +1,29 @@
 <script>
     import { onMount } from 'svelte';
     import SortableList from 'svelte-sortable-list';
+    import { slide } from 'svelte/transition';
+    import SideIcon from '../assets/icons/right.svg';
+    import DownIcon from '../assets/icons/down.svg';
     import setVar, { fetchFolders } from '../utils';
     import GitFolder from './GitFolder.svelte';
     let folders = [];
     let hidden = {};
     let selected;
+    let selectedWorkSpace;
     const updateSelected = (name) => {
         if (selected === name) {
             selected = '';
             return;
         }
         selected = name;
+    };
+
+    const updateSelectedWorkspace = (name) => {
+        if (selectedWorkSpace === name) {
+            selectedWorkSpace = '';
+            return;
+        }
+        selectedWorkSpace = name;
     };
     onMount(() => {
         setVar(tsvscode);
@@ -43,6 +55,7 @@
         switch (message.command) {
             case 'GIT_FOLDERS':
                 folders = [...message.data];
+                console.log({ folders });
                 break;
         }
     });
@@ -66,18 +79,49 @@
             </div>
         </div>
     {/if}
-    <SortableList list={folders} key="path" on:sort={sortList} let:item>
-        <GitFolder
-            name={item.name}
-            path={item.path}
-            {selected}
-            {updateSelected}
-            {toggleHiddenStatus}
-        />
+    <SortableList list={folders} key="name" on:sort={sortList} let:item>
+        <div
+            on:click={() => updateSelectedWorkspace(item.name)}
+            class="workspace"
+        >
+            <div>{item.name}</div>
+            <div>
+                {#if selectedWorkSpace === item.name}
+                    <DownIcon width="15px" />
+                {:else}
+                    <SideIcon width="15px" />
+                {/if}
+            </div>
+        </div>
+        {#if selectedWorkSpace === item.name}
+            <div transition:slide>
+                <SortableList
+                    list={item.folders}
+                    key="path"
+                    on:sort={sortList}
+                    let:item
+                >
+                    <GitFolder
+                        name={item.name}
+                        path={item.path}
+                        {selected}
+                        {updateSelected}
+                        {toggleHiddenStatus}
+                    />
+                </SortableList>
+            </div>
+        {/if}
     </SortableList>
 </div>
 
 <style type="text/scss">
+    .workspace {
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        color: var(--vscode-textLink-foreground);
+        cursor: pointer;
+    }
     .hidden-folders {
         .title {
             font-weight: 600;

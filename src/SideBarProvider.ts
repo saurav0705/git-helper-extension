@@ -31,23 +31,25 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     }
 
     processFolders = (folders: any) => {
-        let flattenFolders = folders.reduce((prev: [], item: any) => {
-            return [...prev, ...item];
-        }, []);
-        let filteredFolders =
-            flattenFolders.filter((item: any) => item.endsWith('.git')) || [];
+        return folders.map((item: { name: any; folders: [] }) => {
+            let filteredFolders =
+                item.folders.filter((item: any) => item.endsWith('.git')) || [];
 
-        return filteredFolders.reduce((prev: any, item: any) => {
-            let path = item.replace('/.git', '');
-            let splitArray = path.split('/');
-            return [
-                ...prev,
-                {
-                    path,
-                    name: splitArray[splitArray.length - 1]
-                }
-            ];
-        }, []);
+            return {
+                name: item.name,
+                folders: filteredFolders.reduce((prev: any, item: any) => {
+                    let path = item.replace('/.git', '');
+                    let splitArray = path.split('/');
+                    return [
+                        ...prev,
+                        {
+                            path,
+                            name: splitArray[splitArray.length - 1]
+                        }
+                    ];
+                }, [])
+            };
+        });
     };
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
