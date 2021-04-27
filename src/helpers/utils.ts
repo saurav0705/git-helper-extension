@@ -18,8 +18,14 @@ export const getLocalBranches = async (path: string) => {
     return data;
 };
 export const getRemoteBranches = async (path: string) => {
-    let data = await execShell(`cd ${path} && git branch -r`);
-    return data.replace(/origin\//g, '');
+    try {
+        // let data = await execShell(`cd ${path} && git fetch --all`);
+        // let deletedRemote = await execShell(`cd ${path} && git fetch -p`);
+        let remoteData = await execShell(`cd ${path} && git branch -r`);
+        return remoteData.replace(/origin\//g, '');
+    } catch (err) {
+        console.log({ err });
+    }
 };
 
 export const deleteLocalBranch = async (branch: string, path: string) => {

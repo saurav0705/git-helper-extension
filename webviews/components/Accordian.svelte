@@ -9,11 +9,13 @@
     let showList = [];
     let show = false;
     let searchText = '';
-
+    let data;
     const filterList = () => {
-        showList = list.filter((item) => item.branch.includes(searchText));
+        showList = data.filter((item) => item.branch.includes(searchText));
     };
+
     $: {
+        data = list;
         if (searchText || true) {
             filterList();
         }
@@ -24,7 +26,7 @@
     <div on:click={() => (show = !show)} class="title">
         <div>{title}</div>
         <div class="search-result-count">
-            {searchText.length ? showList.length : list.length}
+            {searchText.length ? showList.length : data.length}
         </div>
         <OpenClose open={show} />
     </div>
@@ -46,7 +48,7 @@
                         />
                     {/each}
                 {:else}
-                    {#each list as item, index}
+                    {#each data as item, index}
                         <Tile
                             selected={item.selected}
                             title={item.branch}

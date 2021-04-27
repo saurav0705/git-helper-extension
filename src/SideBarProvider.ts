@@ -85,14 +85,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     break;
                 case actions.fetchLocalBranches:
                     getLocalBranches(data.data).then((resp) => {
-                        this.performActionAndRefresh(
-                            () =>
-                                this.sendMessageToWebView({
-                                    command: `${data.data}local_branches`,
-                                    data: processResponse(resp)
-                                }),
-                            data.data
-                        );
+                        this.sendMessageToWebView({
+                            command: `${data.data}local_branches`,
+                            data: processResponse(resp)
+                        });
                     });
                     break;
                 case actions.fetchAllRemoteBranches:
@@ -106,9 +102,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 case actions.deleteLocalBranch:
                     deleteLocalBranch(data.data.branch, data.data.path)
                         .then((resp) => {
-                            vscode.window.showInformationMessage(
-                                'Branch Deleted Succesfully'
-                            );
+                            this.performActionAndRefresh(() => {
+                                vscode.window.showInformationMessage(
+                                    `${data.data.branch} Branch Deleted Succesfully`
+                                );
+                            }, data.data.path);
                         })
                         .catch((err) => vscode.window.showErrorMessage(err));
                     break;

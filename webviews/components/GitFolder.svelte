@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import Accordian from './Accordian.svelte';
     import { slide } from 'svelte/transition';
-    import setVar, { fetchValues, infoMessage } from '../utils';
+    import { fetchValues, infoMessage } from '../utils';
     import HideIcon from '../assets/icons/hide.svg';
     import OpenClose from './OpenClose.svelte';
     export let path;
@@ -13,21 +13,26 @@
     let branches = [];
     let remote_branches = [];
     onMount(() => {
-        setVar(tsvscode);
         fetchValues(path);
     });
+
+    const setLocal = (local) => (branches = local);
+
+    const setRemote = (arr) => (remote_branches = [...arr]);
 
     window.addEventListener('message', (event) => {
         const message = event.data; // The JSON data our extension sent
 
         switch (message.command) {
             case `${path}local_branches`:
-                branches = [...message.data];
+                setLocal(message.data);
                 break;
             case `${path}remote_branches`:
                 remote_branches = [...message.data];
                 break;
             case `${path}refresh`:
+                branches = [];
+                remote_branches = [];
                 fetchValues(path);
                 break;
         }
